@@ -1,0 +1,52 @@
+#sidebarDropdown::-webkit-scrollbar{
+    width: 5px;
+    padding: 5rem;
+    /* visibility: hidden; */
+  }
+  #sidebarDropdown::-webkit-scrollbar-track{
+    background-color: rgb(255, 255, 255);
+    /* visibility: hidden; */
+    padding: 5rem;
+    border-radius: 5px;
+    }
+  #sidebarDropdown::-webkit-scrollbar-thumb{
+    background-color: rgb(198, 198, 198);
+    border-radius: 5px;
+    visibility: hidden;
+  }
+  #sidebarDropdown:hover::-webkit-scrollbar-thumb{
+    visibility: visible;
+    transition: visibility 5s ease-in-out 1s;
+  }
+/* Payment visa apply horizontal scroll bar */
+
+#visa_payment::-webkit-scrollbar{
+  height: 8px;
+}
+#visa_payment::-webkit-scrollbar-track{
+  background-color: rgb(255, 255, 255);
+  }
+#visa_payment::-webkit-scrollbar-thumb{
+  background-color: rgb(198, 198, 198);
+}
+
+/* Body scrollbar */
+
+#maincontainer::-webkit-scrollbar{
+  width: 10px;
+  padding: 5rem;
+  /* visibility: hidden; */
+}
+#maincontainer::-webkit-scrollbar-track{
+  background-color: rgb(255, 255, 255);
+  /* visibility: hidden; */
+  padding: 5rem;
+  }
+  #maincontainer::-webkit-scrollbar-thumb{
+    background-color: #989898;
+    
+  }
+  #maincontainer::-webkit-scrollbar-thumb:hover{
+    background-color: rgb(79, 79, 79);
+
+  }

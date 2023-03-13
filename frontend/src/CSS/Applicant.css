@@ -1,0 +1,44 @@
+#applicantTable::-webkit-scrollbar{
+    width: 5px;
+    visibility: hidden;
+  }
+  #applicantTable::-webkit-scrollbar-track{
+    background-color: white;
+    visibility: hidden;
+    }
+  #applicantTable::-webkit-scrollbar-thumb{
+    background-color: #2B7FFF;
+    border-radius: 10px;
+    opacity: 0.7;
+    /* width: 20px !important; */
+    visibility: hidden;
+  }
+  #applicantTable:hover::-webkit-scrollbar-thumb{
+    visibility: visible;
+    transition: visibility 5s ease-in-out 1s;
+  }
+
+  /* grid view scrollbar */
+  #gridViewScrollbar::-webkit-scrollbar{
+    width: 5px;
+    visibility: hidden;
+  }
+  #gridViewScrollbar::-webkit-scrollbar-track{
+    background-color: white;
+    visibility: hidden;
+    }
+  #gridViewScrollbar::-webkit-scrollbar-thumb{
+    background-color: #dfdfdf;
+    border-radius: 10px;
+    opacity: 0.7;
+    visibility: hidden;
+  }
+  #gridViewScrollbar:hover::-webkit-scrollbar-thumb{
+    visibility: visible;
+    transition: visibility 5s ease-in-out 1s;
+  }
+
+  /* Filter fropdown */
+  #filter_dropdown p:not(:first-child){
+    border-top: 1px solid #ececec;
+  }

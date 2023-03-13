@@ -1,0 +1,19 @@
+.activities_timeline::before{
+    content: '';
+    position: absolute;
+    background-color: rgb(186, 30, 30);
+    min-height: 100%;
+    width: 1px;
+    top: 0;
+    right: 0;
+} 
+ .activities::before{
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background-color: #2B7FFF;
+    border-radius: 100%;
+    border: 3px solid white;
+    left: -28.5px;
+}

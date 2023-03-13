@@ -1,0 +1,19 @@
+version: "3.8"
+services: 
+  app:
+    container_name: docker-node
+    restart: always
+    build: .
+    ports: 
+      - 3000:4000
+    environment:
+      DB_URL: mongodb://mongo/ECMS  
+
+  mongo:
+    image: mongo:4.0-xenial
+    ports:
+      - 27017:27017
+    volumes:
+      - ECMS:/data/db
+volumes:
+  ECMS:

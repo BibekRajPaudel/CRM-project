@@ -1,0 +1,14 @@
+/* University details CSS */
+
+.universitydetailsimage::before{
+    content: '';
+    position: absolute;
+    bottom: 0;
+    top: 0;
+    right: 0;
+    left: 0;
+    border-radius: 6px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.53) 0%,
+            rgba(0, 0, 0, 0.3) 100%), linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, transparent 100%);
+    z-index: 1;
+}

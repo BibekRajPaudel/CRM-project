@@ -1,0 +1,21 @@
+import React from 'react'
+import {GoogleLogin} from 'react-google-login'
+
+const clientId='480547441435-v94trieukkbeivtrr3no9k4urooolujg.apps.googleusercontent.com'
+const GLogin = () => {
+    const onSuccess=(res)=>{
+        console.log("Login",res.profileObj)
+    }
+  return (
+    <div>
+      <GoogleLogin
+      clientId={clientId}
+      buttonText='Loginout'
+      
+      onLogoutSuccess={onSuccess}
+      />
+    </div>
+  )
+}
+
+export default GLogin
