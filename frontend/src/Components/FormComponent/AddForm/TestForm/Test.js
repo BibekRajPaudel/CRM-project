@@ -8,7 +8,7 @@ const Test = () => {
     axios
       .post("http://localhost:3000/api/v1/test", formData)
       .then((res) => {
-        toast.success("Course added");
+        toast.success("Test added");
         setTimeout(() => {
           window.location.href = "/classProgram"
         }, 2000)
