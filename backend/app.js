@@ -3,10 +3,12 @@ const app = express();
 const errorMiddleWare = require("./middleware/error");
 cors = require("cors");
 const path = require("path");
+const cookieParser = require("cookie-parser")
 
 app.use(cors());
 
 app.use(express.json());
+app.use(cookieParser())
 
 //Route Imports
 const user = require("./routes/userRoutes");

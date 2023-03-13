@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const program = require("./Programs");
 
 const addUniversity = new mongoose.Schema({
   universityName: {
@@ -68,44 +69,18 @@ const addUniversity = new mongoose.Schema({
     type: String,
     required: true,
   },
-  courseName:{
-    type:String,
-    required:false
-},
-program:{
-    type:String,
-    required:false
-},
-level:{
-    type:String,
-    required:false
-},
-tutionFeeFirst:{
-    type:String,
-    required:false
-},
-tutionFeeSecond:{
-    type:String,
-    required:false
-},
-tutionFeeThird:{
-    type:String,
-    required:false
-},
-
-selectIntakes:{
-    type:String,
-    required:false
-},
-coursePeriod:{
-    type:String,
-    required:false
-},
-courseDescription:{
-    type:String,
-    required:false
-},
-
+  profile: {
+    type: String,
+    required: false,
+  },
+  background: {
+    type: String,
+    required: false,
+  },
+  admission:{
+  type:[String]
+  },
+  program:[program],
   createdAt: {
     type: Date,
     default: Date.now,

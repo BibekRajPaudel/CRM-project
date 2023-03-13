@@ -3,22 +3,26 @@ const AcademicDetailsSchema = new mongoose.Schema({
     Education:{
         type:String,
         enum:["+2","Bachelor Level", "Master Level"],
-        required:[true, "Please select an option"]
+        required:[false, "Please select an option"]
       },
     
       collegeName: {
         type: String,
-        required: [true, "Please provide your College name"],
+        required: [false, "Please provide your College name"],
       },
       
       joinedYear:{
-        type: Date,
-        required: [true, "Please add joined year"],
+        type: String,
+        required: [false, "Please add joined year"],
       },
       
       passedYear: {
-        type: Date,
-        required: [true, "Please add year passed"],
+        type: String,
+        required: [false, "Please add year passed"],
+      },
+      uploadMarkSheet: {
+        type: String,
+        required: false
       },
       createdAt:{
         type:Date,

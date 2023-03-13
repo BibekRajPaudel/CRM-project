@@ -1,51 +1,51 @@
 const mongoose = require("mongoose");
-const AcademicDetailsSchema = require("../Form/AcademicDetails")
-const ieltsSchema = require("../Form/Ielts")
-const greSchema = require("../Form/Gre")
-const pteSchema = require("../Form/PTE")
-const tofelSchema = require("../Form/Tofel")
+const AcademicDetailsSchema = require("../Form/AcademicDetails");
+const englishTestSchema = require("./EnglishTest");
+const counsellorSchema = require("./CounsellorDetail")
+const taskSchema = require("./Task");
+const paymentSchema = require("./Payment");
 
 const LeadForm = new mongoose.Schema({
   firstName: {
     type: String,
-    trim:true,
-    required:true
+    trim: true,
+    required: false,
   },
   middleName: {
     type: String,
-    required:false
+    required: false,
   },
   lastName: {
     type: String,
-    required: [true, "Please provide your last name"],
+    required: [false, "Please provide your last name"],
   },
   temporaryAddress: {
     type: String,
-    required: [true, "Please provide your temporary Address"],
+    required: [false, "Please provide your temporary Address"],
   },
   permanentAddress: {
     type: String,
-    required: [true, "Please provide your permanent Address"],
+    required: [false, "Please provide your permanent Address"],
   },
   dateOfBirth: {
-    type: Date,
-    required: [true, "Please add a date of birth"],
+    type: String,
+    required: [false, "Please add a date of birth"],
   },
   gender: {
     type: String,
     enum: ["male", "female", "others"],
-    required: [true, "Please choose a gender"],
+    required: [false, "Please choose a gender"],
   },
   contactNumber: {
     type: String,
     trim: true,
-    required: [true, "Contact number is required"],
+    required: [false, "Contact number is required"],
   },
   email: {
     type: String,
     trim: true,
     lowercase: true,
-    required: [true, "Email address is required"],
+    required: [false, "Email address is required"],
     unique: false,
     match: [
       /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
@@ -53,142 +53,79 @@ const LeadForm = new mongoose.Schema({
     ],
   },
 
-  uploadCitizenship:{
-    type:String,
-    trim:true,
-    required:false
+  uploadCitizenship: {
+    type: String,
+    trim: true,
+    required: false,
   },
 
-  uploadPassport:{
-    type:String,
-    trim:true,
-    required:false
+  uploadPassport: {
+    type: String,
+    trim: true,
+    required: false,
   },
-  uploadMarkSheet:{
-    type:String,
-    trim:true,
-    required:false
-  },
-  interestedCountry:{
+  
+  interestedCountry: {
     type: String,
     enum: ["USA", "Canada", "UK", "Australia"],
-    required: [true, "Please choose a country"],
+    required: [false, "Please choose a country"],
   },
 
-  interestedUniversity:{
+  interestedUniversity: {
     type: String,
-    required: [true, "Please mention a university"],
+    required: [false, "Please mention a university"],
   },
 
-  chooseTheDegree:{
-    type:String,
-    enum: ["Diploma Level", "Bachelor Level", "PostGraduate Level", "Master Level"],
-    required:false
+  chooseTheDegree: {
+    type: String,
+    enum: [
+      "Diploma Level",
+      "Bachelor Level",
+      "PostGraduate Level",
+      "Master Level",
+    ],
+    required: false,
   },
-  chooseTheCourse:{
-    type:String,
-    required:false
+  chooseTheCourse: {
+    type: String,
+    required: false,
   },
-  applyingFor:{
+  applyingFor: {
     type: String,
     enum: ["Dependent", "Independent"],
-    required: [true, "Please choose an option"],
+    required: [false, "Please choose an option"],
   },
 
-  examBefore:{
-    type:String,
-    enum:["Yes","No"],
-    required:[true, "Please select an option"]
-  },
-  Referal:{
-    type:String,
-    enum:["None","Social Media", "Friend"],
-    required:true
-  },
-  bookAvailableCounseller:{
-    type:String
-  },
-  Comments:{
-    type:String,
-    required:true
-  },
-  status:{
-    type:String,
-    default:"New"
-  },
-  academicDetails:[
-    {
-      Education:{
-    type:String,
-    enum:["+2","Bachelor Level", "Master Level"],
-    required:[true, "Please select an option"]
-  },
-
-  collegeName: {
+  examBefore: {
     type: String,
-    required: [true, "Please provide your College name"],
+    enum: ["Yes", "No"],
+    required: [false, "Please select an option"],
   },
-  
-  joinedYear:{
+  Referal: {
+    type: String,
+    enum: ["None", "Social Media", "Friend"],
+    required: false,
+  },
+  bookAvailableCounseller: {
+    type: String,
+  },
+  Comments: {
+    type: String,
+    required: false,
+  },
+  status: {
+    type: String,
+    default: "New",
+  },
+  academicDetails: [AcademicDetailsSchema],
+  englishTest: [englishTestSchema],
+  payment:[paymentSchema],
+  addCounsellor:[counsellorSchema],
+  task:[taskSchema],
+  createdAt: {
     type: Date,
-    required: [true, "Please add joined year"],
+    default: Date.now,
   },
-  
-  passedYear: {
-    type: Date,
-    required: [true, "Please add year passed"],
-  },
-  createdAt:{
-    type:Date,
-    default:Date.now
-  }
-}],
-  englishTest:[{
-    givenExamDate: {
-      type: Date,
-      required: false,
-    },
-    Reading: {
-      type: Number,
-      min: 0,
-      max: 10,
-      required: false
-    },
-    Writing: {
-      type: Number,
-      min: 0,
-      max: 10,
-      required: false
-    },
-    Speaking: {
-      type: Number,
-      min: 0,
-      max: 10,
-      required: false
-    },
-    Listening: {
-      type: Number,
-      min: 0,
-      max: 10,
-      required: false
-    },
-    overallScore: {
-      type: Number,
-      min: 0,
-      max: 10,
-      required: false
-    },
-    createdAt:{
-      type:Date,
-      default:Date.now
-    }}
-  ],
-  createdAt:{
-    type:Date,
-    default:Date.now
-  }
-  
-
 });
 
 module.exports = mongoose.model("LeadFormSchema", LeadForm);

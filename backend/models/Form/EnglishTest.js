@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
-const ieltsSchema = new mongoose.Schema({
+const englishTestSchema = new mongoose.Schema({
   givenExamDate: {
-    type: Date,
+    type: String,
     required: [true, "Please enter the required date"],
   },
   Reading: {
@@ -27,12 +27,15 @@ const ieltsSchema = new mongoose.Schema({
   overallScore: {
     type: Number,
     min: 0,
-    max: 10,
+    max: 1000,
   },
-  createdAt:{
-    type:Date,
-    default:Date.now
-  }
-
+  testType: {
+    type: String,
+    required: false,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
-module.exports = ieltsSchema;
+module.exports = englishTestSchema;

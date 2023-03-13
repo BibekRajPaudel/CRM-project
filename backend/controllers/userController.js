@@ -8,10 +8,11 @@ const LeadFormSchema = require("../models/Form/LeadForm");
 const StudentProfileSchema = require("../models/StudentProfile");
 const cloudinary = require("cloudinary");
 require("../utils.js/cloudinary");
-const Task = require("../models/Task");
-const countryFormSchema = require("../models/Form/countryForm");
-const testPaymentSchema = require("../models/Form/testPayment");
-const visaApplyPaymentchema = require("../models/Form/visaApplyPayment");
+const countryFormSchema = require("../models/countryForm");
+const visaApplyPaymentchema = require("../models/Form/Payment");
+const counsellorSchema = require("../models/Form/CounsellorDetail");
+const { sendOtpVerificationEmail } = require("../utils.js/OTP");
+const { datacatalog } = require("googleapis/build/src/apis/datacatalog");
 
 //Create StudentProfile
 const StudentProfile = catchAsyncErrors(async (req, res, next) => {
@@ -73,7 +74,6 @@ const registerUser = catchAsyncErrors(async (req, res, next) => {
     password,
     confirmPassword,
   });
-
   sendToken(user, 200, res);
 });
 
@@ -189,6 +189,83 @@ const resetPassword = catchAsyncErrors(async (req, res, next) => {
   sendToken(user, 200, res);
 });
 
+//Get userDetails
+const getUserDetails = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.user._id);
+
+  res.status(200).json({
+    success: true,
+    user,
+  });
+});
+
+//Edit User Details
+const editUserDetails = catchAsyncErrors(async (req, res, next) => {
+  const { permanentAddress, temporaryAddress, dateOfBirth, contact, gender } =
+    req.body;
+  let user = await User.findById(req.user._id);
+
+  user.temporaryAddress = temporaryAddress;
+  user.permanentAddress = permanentAddress;
+  user.dateOfBirth = dateOfBirth;
+  user.contact = contact;
+  user.gender = gender;
+
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    user,
+  });
+});
+
+//Edit User Details File
+const editFiles = catchAsyncErrors(async (req, res, next) => {
+  let update = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        "report.$[details].file": req.body.file.path,
+        "report.$[details].collegeName": req.body.name,
+      },
+    },
+    { arrayFilters: [{ "details._id": req.params.reportsId }] }
+  );
+
+  res.status(200).json({
+    success: true,
+    message: "Documents updated",
+  });
+});
+
+//Add Report
+const addReport = catchAsyncErrors(async (req, res, next) => {
+  const data = await User.findById(req.user._id);
+
+  data.report.push({
+    pdf:req.file.path,
+    name:req.body.name
+  });
+
+  await data.save();
+
+  res.status(201).json({
+    data
+  });
+});
+//Delete Task
+const deleteReport = catchAsyncErrors(async (req, res, next) => {
+  let del = await User.updateOne(
+    { _id: req.user._id },
+    { $pull: { report: { _id: req.params.reportsId } } }
+  );
+
+  res.status(200).json({
+    success: true,
+    message: "Report deleted",
+  });
+});
+
 // LeadForm
 const LeadForm = catchAsyncErrors(async (req, res, next) => {
   const {
@@ -221,12 +298,10 @@ const LeadForm = catchAsyncErrors(async (req, res, next) => {
     bookAvailableCounseller,
     Referal,
     Comments,
+    academicDetails,
+    addCounsellor,
+    task,
   } = req.body;
-
-  const multipleFiles = req.files;
-  const result1 =  multipleFiles.uploadMarkSheet[0].path
-  const result2 = multipleFiles.uploadCitizenship[0].path
-  const result3 = multipleFiles.uploadPassword[0].path
 
   const FormField = await LeadFormSchema.create({
     firstName,
@@ -238,13 +313,10 @@ const LeadForm = catchAsyncErrors(async (req, res, next) => {
     dateOfBirth,
     contactNumber,
     email,
-    uploadCitizenship: result2,
-    uploadPassword: result3,
     Education,
     collegeName,
     joinedYear,
     passedYear,
-    uploadMarkSheet: result1,
     interestedCountry,
     interestedUniversity,
     chooseTheDegree,
@@ -261,6 +333,9 @@ const LeadForm = catchAsyncErrors(async (req, res, next) => {
     bookAvailableCounseller,
     Referal,
     Comments,
+    academicDetails,
+    addCounsellor,
+    task,
   });
 
   res.status(201).json({
@@ -271,6 +346,7 @@ const LeadForm = catchAsyncErrors(async (req, res, next) => {
 
 //Get all LeadForm Data
 const leadFormData = catchAsyncErrors(async (req, res, next) => {
+  // const formData = await LeadFormSchema.find().populate("addCounsellor");
   const formData = await LeadFormSchema.find();
 
   res.status(200).json({
@@ -286,6 +362,44 @@ const leadFormDataById = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     success: true,
     formData,
+  });
+});
+
+//File Upload for personal documents
+const fileUpload = catchAsyncErrors(async (req, res, next) => {
+  let result2, result3;
+  const multipleFiles = req.files;
+
+  result2 = multipleFiles.uploadCitizenship[0].path;
+  result3 = multipleFiles.uploadPassport[0].path;
+
+  let update = await LeadFormSchema.findByIdAndUpdate(req.params.id, {
+    $set: { uploadCitizenship: result2, uploadPassport: result3 },
+  });
+
+  res.status(200).json({
+    success: "File uploaded successfully",
+  });
+});
+
+//File Upload for academic documents
+const academicUpload = catchAsyncErrors(async (req, res, next) => {
+  let result1;
+  const file = req.file;
+  result1 = file.path;
+
+  let update = await LeadFormSchema.findByIdAndUpdate(
+    req.params.leadId,
+    {
+      $set: {
+        "academicDetails.$[sheet].uploadMarkSheet": result1,
+      },
+    },
+    { arrayFilters: [{ "sheet._id": req.params.sheetId }] }
+  );
+
+  res.status(200).json({
+    success: "File updated successfully",
   });
 });
 
@@ -306,6 +420,91 @@ const updateLeadFormDataById = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     success: true,
     formData,
+  });
+});
+
+//Edit leadform-academicDetails
+const updateAcademicDetails = catchAsyncErrors(async (req, res, next) => {
+  let update = await LeadFormSchema.findByIdAndUpdate(
+    req.params.leadId,
+    {
+      $set: {
+        "academicDetails.$[details].Education": req.body.Education,
+        "academicDetails.$[details].collegeName": req.body.collegeName,
+        "academicDetails.$[details].joinedYear": req.body.joinedYear,
+        "academicDetails.$[details].passedYear": req.body.passedYear,
+      },
+    },
+    { arrayFilters: [{ "details._id": req.params.academicDetailsId }] }
+  );
+
+  res.status(200).json({
+    success: true,
+    message: "Documents updated",
+  });
+});
+//Get academicDetails
+const getAcademicDetailsById = catchAsyncErrors(async (req, res, next) => {
+  const formData = await LeadFormSchema.findById(req.params.leadId);
+
+  const academicDetail = formData.academicDetails.id(
+    req.params.academicDetailsId
+  );
+
+  res.status(200).json({
+    success: true,
+    academicDetail,
+  });
+});
+
+//Add English Test
+const addEnglishTest = catchAsyncErrors(async (req, res, next) => {
+  const formData = await LeadFormSchema.findById(req.params.id);
+
+  formData.englishTest.push({
+    ...req.body,
+  });
+
+  await formData.save();
+
+  res.status(201).json({
+    data: formData.englishTest,
+  });
+});
+
+//Edit leadform-EnglishTest
+const updateEnglishTest = catchAsyncErrors(async (req, res, next) => {
+  let update = await LeadFormSchema.findByIdAndUpdate(
+    req.params.leadId,
+    {
+      $set: {
+        "englishTest.$[test].givenExamDate": req.body.givenExamDate,
+        "englishTest.$[test].Reading": req.body.Reading,
+        "englishTest.$[test].Writing": req.body.Writing,
+        "englishTest.$[test].Speaking": req.body.Speaking,
+        "englishTest.$[test].Listening": req.body.Listening,
+        "englishTest.$[test].overallScore": req.body.overallScore,
+        "englishTest.$[test].testType": req.body.testType,
+      },
+    },
+    { arrayFilters: [{ "test._id": req.params.TestId }] }
+  );
+
+  res.status(200).json({
+    success: true,
+    message: "Documents updated",
+  });
+});
+
+//Get english test by id
+const getEnglishTestById = catchAsyncErrors(async (req, res, next) => {
+  const formData = await LeadFormSchema.findById(req.params.leadId);
+
+  const engTest = formData.englishTest.id(req.params.TestId);
+
+  res.status(200).json({
+    success: true,
+    engTest,
   });
 });
 
@@ -330,6 +529,27 @@ const updateLeadFormStatus = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+//Update only the counsellor
+const updateOnlyCounsellor = catchAsyncErrors(async (req, res, next) => {
+  const counsellor = req.body;
+  let formData = await LeadFormSchema.findById(req.params.id);
+
+  if (!formData) {
+    return next(new ErrorHandler("Form Data not found ", 404));
+  }
+
+  formData = await LeadFormSchema.findByIdAndUpdate(req.params.id, counsellor, {
+    new: true,
+    runValidators: true,
+    useFindAndModify: false,
+  });
+
+  res.status(200).json({
+    success: true,
+    formData,
+  });
+});
+
 //Create Form1
 const countryForm = catchAsyncErrors(async (req, res, next) => {
   const country = await countryFormSchema.create(req.body);
@@ -340,23 +560,151 @@ const countryForm = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-//Create Form2-Test Payment Slip
-const testPaymentForm = catchAsyncErrors(async (req, res, next) => {
-  const testPayment = await testPaymentSchema.create(req.body);
+//Add Counsellor
+const addCounsellor = catchAsyncErrors(async (req, res, next) => {
+  const formData = await LeadFormSchema.findById(req.params.id);
+
+  formData.addCounsellor.push({
+    ...req.body,
+  });
+
+  await formData.save();
 
   res.status(201).json({
-    success: true,
-    testPayment,
+    data: formData.addCounsellor,
   });
 });
 
-//Create Form2-Visa Payment Slip
-const visaPaymentForm = catchAsyncErrors(async (req, res, next) => {
-  const visaPayment = await visaApplyPaymentchema.create(req.body);
+//Edit Counsellor
+const editCounsellorDetails = catchAsyncErrors(async (req, res, next) => {
+  const counsellorDetailsId = req.params.id;
+  const formData = await LeadFormSchema.findById(req.body._id);
+
+  if (formData) {
+    const counsellorDetails = [...formData.addCounsellor];
+
+    const counsellorDetail = counsellorDetails.find(
+      (x) => x._id.toString() === counsellorDetailsId
+    );
+
+    counsellorDetail.name = req.body.name || counsellorDetail.name;
+    counsellorDetail.contact = req.body.contact || counsellorDetail.contact;
+    counsellorDetail.email = req.body.email || counsellorDetail.email;
+  }
+
+  await formData.save();
+
+  res.status(200).json({
+    msg: "Counsellors Updated Successfully",
+  });
+});
+
+//Get all Counsellor
+const getCounsellor = catchAsyncErrors(async (req, res, next) => {
+  const counsellor = await counsellorSchema.find();
+
+  res.status(200).json({
+    success: true,
+    counsellor,
+  });
+});
+
+//Delete Counsellor
+const deleteCounsellor = catchAsyncErrors(async (req, res, next) => {
+  let del = await LeadFormSchema.updateOne(
+    { _id: req.params.leadId },
+    { $pull: { addCounsellor: { _id: req.params.counsellorId } } }
+  );
+
+  res.status(200).json({
+    success: true,
+    message: "Counsellor deleted",
+  });
+});
+
+//Add Payment
+const addPayment = catchAsyncErrors(async (req, res, next) => {
+  const formData = await LeadFormSchema.findById(req.params.id);
+
+  const pdf = req.file;
+  const path = pdf.path;
+
+  formData.payment.push({
+    name: req.body.name,
+    bank: req.body.bank,
+    paymentFor: req.body.paymentFor,
+    totalAmount: req.body.totalAmount,
+    date: req.body.date,
+    receipt: path,
+  });
+
+  await formData.save();
 
   res.status(201).json({
+    data: formData.payment,
+  });
+});
+
+//Edit Payment except receipt
+const editPayment = catchAsyncErrors(async (req, res, next) => {
+  let update = await LeadFormSchema.findByIdAndUpdate(
+    req.params.leadId,
+    {
+      $set: {
+        "payment.$[receipt].name": req.body.name,
+        "payment.$[receipt].bank": req.body.bank,
+        "payment.$[receipt].paymentFor": req.body.paymentFor,
+        "payment.$[receipt].totalAmount": req.body.totalAmount,
+        "payment.$[receipt].date": req.body.date,
+      },
+    },
+    { arrayFilters: [{ "receipt._id": req.params.paymentId }] }
+  );
+
+  res.status(201).json({
+    success: "Edited successfully",
+  });
+});
+
+//Edit Payment - receipt
+const editPaymentReceipt = catchAsyncErrors(async (req, res, next) => {
+  let update = await LeadFormSchema.findByIdAndUpdate(
+    req.params.leadId,
+    {
+      $set: {
+        "payment.$[file].receipt": req.file.path,
+      },
+    },
+    { arrayFilters: [{ "file._id": req.params.paymentId }] }
+  );
+
+  res.status(201).json({
+    success: "Receipt updated successfully",
+  });
+});
+
+//Get paymentbyid
+const getPaymentById = catchAsyncErrors(async (req, res, next) => {
+  const formData = await LeadFormSchema.findById(req.params.leadId);
+
+  const paymentbyid = formData.payment.id(req.params.paymentId);
+
+  res.status(200).json({
+    success: "true",
+    paymentbyid,
+  });
+});
+
+//Delete Payment
+const deletePayment = catchAsyncErrors(async (req, res, next) => {
+  let del = await LeadFormSchema.updateOne(
+    { _id: req.params.leadId },
+    { $pull: { payment: { _id: req.params.paymentId } } }
+  );
+
+  res.status(200).json({
     success: true,
-    visaPayment,
+    message: "Payment deleted",
   });
 });
 
@@ -372,8 +720,28 @@ module.exports = {
   countryForm,
   leadFormData,
   leadFormDataById,
-  updateLeadFormDataById,
+  fileUpload,
   updateLeadFormStatus,
-  testPaymentForm,
-  visaPaymentForm,
+  addCounsellor,
+  getCounsellor,
+  updateOnlyCounsellor,
+  editCounsellorDetails,
+  deleteCounsellor,
+  updateLeadFormDataById,
+  academicUpload,
+  updateAcademicDetails,
+  getAcademicDetailsById,
+  updateEnglishTest,
+  addEnglishTest,
+  getEnglishTestById,
+  addPayment,
+  editPayment,
+  editPaymentReceipt,
+  getPaymentById,
+  deletePayment,
+  getUserDetails,
+  editUserDetails,
+  editFiles,
+  addReport,
+  deleteReport
 };
