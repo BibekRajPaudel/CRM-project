@@ -6,7 +6,7 @@ const paymentSchema = new mongoose.Schema({
   },
   bank: {
     type: String,
-    required: [true, "Please enter the bank name"],
+    required: [false, "Please enter the bank name"],
   },
   paymentFor: {
     type: String,

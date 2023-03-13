@@ -337,6 +337,7 @@ const LeadForm = catchAsyncErrors(async (req, res, next) => {
     addCounsellor,
     task,
   });
+  console.log("true")
 
   res.status(201).json({
     success: true,

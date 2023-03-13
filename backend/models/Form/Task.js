@@ -2,11 +2,11 @@ const mongoose = require("mongoose");
 const taskSchema = new mongoose.Schema({
   task: {
     type: String,
-    required: true,
+    required: false,
   },
   dueDate: {
     type: String,
-    required: [true, "Please add the due date"],
+    required: [false, "Please add the due date"],
   },
   progress: {
     type: String,

@@ -288,9 +288,9 @@ const FormComponent = () => {
                     >
                       <option className='text-gray-400' value="None">--Select an option--</option>
                       <option value="USA">USA</option>
-                      <option value="aus">Australia</option>
-                      <option value="can">Canada</option>
-                      <option value="uk">UK</option>
+                      <option value="Australia">Australia</option>
+                      <option value="Canada">Canada</option>
+                      <option value="UK">UK</option>
                     </Field>
                   </div>
                   <div className="w-full flex flex-col gap-2">
